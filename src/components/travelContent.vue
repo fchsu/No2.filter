@@ -40,7 +40,7 @@ export default {
   data() {
     return {
       travelData: JSON.parse(localStorage.getItem('updated')) || [],
-      travelLabel: []
+      travelLabel: JSON.parse(localStorage.getItem('label')) || []
     };
   },
   mounted () {
@@ -64,6 +64,7 @@ export default {
       array.forEach((item, i, data) => {
         this.travelLabel.push(item);
       });
+      localStorage.setItem('label', JSON.stringify(this.travelLabel));
     }
   }
 };
