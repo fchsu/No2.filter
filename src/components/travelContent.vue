@@ -1,16 +1,16 @@
 <template>
   <div class="content">
-    <p v-if="travelData[0]._id != ''">Showing <span>{{ travelData.length }}</span> results by…</p>
-    <ul class="label" v-if="travelData[0]._id != ''">
+    <p v-if="travelData[0]['_id'] != ''">Showing <span>{{ travelData.length }}</span> results by…</p>
+    <ul class="label" v-if="travelData[0]['_id'] != ''">
       <li v-if="travelLabel[0] != 0">{{ travelLabel[0] }}<i class="far fa-times-circle"></i></li>
       <li v-if="travelLabel[2] == true">免費參觀<i class="far fa-times-circle"></i></li>
       <li v-if="travelLabel[3] == true">全天候開放<i class="far fa-times-circle"></i></li>
     </ul>
-    <ul id="travel-content" v-if="travelData[0]._id != ''">
-      <li v-for="item in travelData" :key="item._id" v-on:click="travelDetail(item)">
+    <ul id="travel-content" v-if="travelData[0]['_id'] != ''">
+      <li v-for="item in travelData" :key="item['_id']" v-on:click="travelDetail(item)">
         <router-link :to="{
           name: 'travelDetail',
-          params: { id: item._id }
+          params: { id: item['_id'] }
           }">
           <div class="img" :style="{backgroundImage: 'url(' + item.Picture1 + ')'}"></div>
           <div class="data">
