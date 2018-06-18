@@ -7054,7 +7054,7 @@ export default {
   mounted () {
     const vm = this; // 必須先定義 this，直接在下方程式碼使用 this 會永遠顯示 error.response
     vm.$http
-      .get("../json/data.JSON")
+      .get("../dist/static/json/data.JSON")
       .then(function(response) {
         if (response.request.readyState === 4) {
           if (response.request.status === 200) {
