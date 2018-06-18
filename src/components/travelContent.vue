@@ -1,13 +1,14 @@
 <template>
   <div class="content">
-    <p v-if="travelData[0]['_id'] != ''">Showing <span>{{ travelData.length }}</span> results by…</p>
-    <ul class="label" v-if="travelData[0]['_id'] != ''">
+    <p v-if="travelData[0]['_id'] != ''">Showing<span>{{ travelNum }}</span>results by…</p>
+    <p v-if="travelData[0]['_id'] == ''">Showing<span>0</span>results by…</p>
+    <ul class="label">
       <li v-if="travelLabel[0] != 0">{{ travelLabel[0] }}<i class="far fa-times-circle"></i></li>
       <li v-if="travelLabel[2] == true">免費參觀<i class="far fa-times-circle"></i></li>
       <li v-if="travelLabel[3] == true">全天候開放<i class="far fa-times-circle"></i></li>
     </ul>
     <ul id="travel-content" v-if="travelData[0]['_id'] != ''">
-      <li v-for="item in travelData" :key="item['_id']" v-on:click="travelDetail(item)">
+      <li v-for="(item, i) in travelData" :key="i" v-on:click="travelDetail(item)">
         <router-link :to="{
           name: 'travelDetail',
           params: { id: item['_id'] }
@@ -40,12 +41,15 @@ export default {
   data() {
     return {
       travelData: JSON.parse(localStorage.getItem('updated')) || [],
-      travelLabel: JSON.parse(localStorage.getItem('label')) || []
+      travelLabel: JSON.parse(localStorage.getItem('label')) || [],
+      travelNum: JSON.parse(localStorage.getItem('travelNum')),
+      detailOpen: true
     };
   },
   mounted () {
     this.$bus.$on('updated', this.updated);
     this.$bus.$on('label', this.label);
+    this.$bus.$on('travelNumbers', this.travelNumbers);
   },
   methods: {
     updated (array) {
@@ -58,6 +62,8 @@ export default {
     },
     travelDetail (object) {
       localStorage.setItem('travelContent', JSON.stringify(object));
+      this.detailOpen = !this.detailOpen;
+      this.$bus.$emit('detailContentOpen', this.detailOpen);
     },
     label (array) {
       this.travelLabel.length = 0;
@@ -65,6 +71,10 @@ export default {
         this.travelLabel.push(item);
       });
       localStorage.setItem('label', JSON.stringify(this.travelLabel));
+    },
+    travelNumbers (num) {
+      this.travelNum = num;
+      localStorage.setItem('travelNum', JSON.stringify(this.travelNum));
     }
   }
 };
@@ -73,18 +83,21 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .content {
-  max-width: 780px;
+  width: 780px;
   margin-left: 2%;
 }
-.content p {
+.content > p {
   font-size: 24px;
   line-height: 28px;
   color: #000000;
   margin: 24px 0 8px 0;
+  /* display: flex;
+  width: 780px; */
 }
 .content > p span {
   font-weight: bold;
   color: #9013FE;
+  margin: 0 10px;
 }
 .content .label {
   display: flex;
@@ -194,5 +207,40 @@ export default {
 }
 #travel-content .address-tel i {
   margin-right: 7px;
+}
+@media (max-width: 950px) {
+  #travel-content .img {
+    width: 150px;
+    background-size: cover;
+  }
+  #travel-content .data {
+    width: calc(100% - 150px);
+  }
+}
+@media (max-width: 812px) {
+  #travel-content .data {
+    padding: 10px 10px;
+  }
+}
+@media (max-width: 768px){	/*iPad 直式*/
+  #travel-content a {
+    flex-direction: column;
+  }
+  #travel-content .img {
+    width: 100%;
+    height: 196px;
+    background-size: cover;
+  }
+  #travel-content .data {
+    width: 100%;
+    padding: 24px 20px 18px 20px;
+  }
+}
+@media (max-width: 667px){	/*iPhone678 橫式*/
+  .content {
+    width: 100%;
+    margin: 0;
+    padding: 0 2%;
+  }
 }
 </style>

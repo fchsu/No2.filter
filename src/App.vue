@@ -2,8 +2,11 @@
   <div id="app">
     <div class="header">
       <div>
-        <router-link to="/" tag="h1">Have Fun</router-link>
-        <span>
+        <span v-on:click="detailContentClose()">
+          <router-link to="/" tag="h1">Have Fun</router-link>
+        </span>
+        <!-- <router-link to="/" tag="h1" v-on:click="detailContentClose()">Have Fun</router-link> -->
+        <span class="search">
           <i class="fas fa-search"></i>
           <input type="text" placeholder="Explore your own activities">
         </span>
@@ -33,6 +36,15 @@
         </div>
         <router-view/>
       </div>
+      <ul class="page" v-if="pageOpen">
+        <li>«</li>
+        <li v-if="pageNow > 5">...</li>
+        <li v-for="(item, i) in page" :key="i" 
+          :class="{ pageNnow: item.boolean}"
+          v-on:click="changePage(item.p)">{{ item.p }}</li>
+        <li v-if="pageNum > 5">...</li>
+        <li>»</li>
+      </ul>
     </div>
   </div>
 </template>
@@ -47,6 +59,11 @@ export default {
       categories: ['全部', '免費參觀', '全天候開放'],
       categoriesJson: [' ', 'Ticketinfo', 'Opentime'],
       filterData: [],
+      page: [],
+      pageData: [],
+      pageNum: '',
+      pageNow: '',
+      pageOpen: true,
       travelData: [],
       totalSelect: [0, false, false, false],
       zone: [],
@@ -83,7 +100,8 @@ export default {
   mounted () {
     const vm = this; // 必須先定義 this，直接在下方程式碼使用 this 會永遠顯示 error.response
     vm.$http
-      .get("../dist/static/json/data.JSON")
+      .get("../dist/static/json/data.JSON")    // webpack 壓縮後路徑
+      // .get("../../static/json/data.JSON")    // npm run dev 下的路徑
       .then(function(response) {
         if (response.request.readyState === 4) {
           if (response.request.status === 200) {
@@ -98,17 +116,21 @@ export default {
             vm.$bus.$emit('updated', vm.travelData);
             vm.$bus.$emit('label', vm.totalSelect);
             console.log("json get");
+            vm.travelFilter();
           }
         }
       })
       .catch(function(error) {
         console.log("error.response");
       });
+    this.pageNow = 1;
+    this.$bus.$on('detailContentOpen', this.detailContentOpen);
+    this.$bus.$on('detailContentClose', this.detailContentClose);
   },
   methods: {
     filterZone (e) {
       if (e.target.value === " ") {
-        this.totalSelect.splice(0, 1, '0');
+        this.totalSelect.splice(0, 1, 0);
         this.travelFilter();
       } else {
         this.totalSelect.splice(0, 1, e.target.value);
@@ -153,6 +175,7 @@ export default {
       }
     },
     travelFilter () {
+      this.pageNow = 1;
       if (this.totalSelect[0] == 0) {
         this.travelData.length = 0;
         this.filterData.length = 0;
@@ -169,17 +192,20 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }
             break;
           case "false false false":
-            if (this.travelData.length == 0) {
+            this.filterData = this.travelData.filter((item, i, array) => {
+              return item; 
+            });
+            if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.travelData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }
             break;
           case "false false true":
@@ -188,9 +214,9 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }
             break;
           case "false true true":
@@ -199,9 +225,9 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }
             break;
           case "false true false":
@@ -210,9 +236,9 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }
             break;
         }
@@ -232,17 +258,20 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }  
             break;
           case "false false false":
-            if (this.travelData.length == 0) {
+            this.filterData = this.travelData.filter((item, i, array) => {
+              return item; 
+            });
+            if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.travelData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }  
             break;
           case "false false true":
@@ -251,9 +280,9 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }  
             break;
           case "false true true":
@@ -262,9 +291,9 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }  
             break;
           case "false true false":
@@ -273,13 +302,88 @@ export default {
             });
             if (this.filterData.length == 0) {
               this.$bus.$emit('updated', this.noData);
-            } else {
-              this.$bus.$emit('updated', this.filterData);
               this.$bus.$emit('label', this.totalSelect);
+            } else {
+              this.travelPage();
             }         
             break;
         }
       }
+    },
+    travelPage () {
+      const listLimit = 5;
+      this.page.length = 0;
+      this.pageData.length = 0;
+      let object = {}
+      const Len = this.filterData.length;
+      this.$bus.$emit('travelNumbers', Len);
+      this.pageNum = Math.ceil(Len / listLimit);
+      if (this.pageNum > 5) {
+        for (let i = 0; i < 5; i++) {
+          if (this.pageNow == (i + 1)) {
+            object = {
+              p: i + 1,
+              boolean: true
+            }              
+          } else {
+            object = {
+              p: i + 1,
+              boolean: false
+            }  
+          }
+          this.page.push(object);
+        }
+      } else {
+        for (let i = 0; i < this.pageNum; i++) {
+          if (this.pageNow == (i + 1)) {
+            object = {
+              p: i + 1,
+              boolean: true
+            }              
+          } else {
+            object = {
+              p: i + 1,
+              boolean: false
+            }  
+          }
+          this.page.push(object);        
+        }
+      }
+      if (Len >= listLimit) {
+        const pageStart = this.pageNow * listLimit - listLimit;
+        if (this.pageNow == this.pageNum) {
+          const pageEnd = Len;
+          for (let i = pageStart; i < pageEnd; i++) {
+            this.pageData.push(this.filterData[i]);
+            this.$bus.$emit('updated', this.pageData);
+            this.$bus.$emit('label', this.totalSelect);
+          }
+        } else {
+          const pageEnd = pageStart + listLimit;
+          for (let i = pageStart; i < pageEnd; i++) {
+            this.pageData.push(this.filterData[i]);
+            this.$bus.$emit('updated', this.pageData);
+            this.$bus.$emit('label', this.totalSelect);
+          }
+        }
+      } else {
+        for (let i = 0; i < Len; i++) {
+          this.pageData.push(this.filterData[i]);
+          this.$bus.$emit('updated', this.pageData);
+          this.$bus.$emit('label', this.totalSelect);
+        }
+      }
+    },
+    changePage (num) {
+      this.pageNow = num;
+      this.travelPage(); 
+    },
+    detailContentOpen (boolean) {
+      this.pageOpen = boolean;
+    },
+    detailContentClose (boolean) {
+      // this.pageOpen = boolean;
+      this.pageOpen = true;
     }
   }
 }
@@ -302,10 +406,12 @@ export default {
   align-items: center;
   width: 1200px;
 }
+.header span {
+  margin-left: 6.5%;
+}
 h1 {
   width: 157px;
   height: 44px;
-  margin-left: 6.5%;
   background: url("./assets/img/logo.png") 50% 50% no-repeat;
   text-indent: 101%;
   overflow: hidden;
@@ -313,7 +419,7 @@ h1 {
   color: #000;
   cursor: pointer;
 }
-.header span {
+.header .search {
   margin-left: 12.1%;
   width: 388px;
   height: 32px;
@@ -354,16 +460,15 @@ h1 {
   font-weight: bold;
 }
 .side-content {
-  display: flex;
-  justify-content: center;
   background: #f2f2f2;
   padding-bottom: 24px;
 }
 .side-content > div {
   display: flex;
   justify-content: space-between;
-  width: 1200px;
+  max-width: 1200px;
   padding: 0 3.3% 0 3.2%;
+  margin: 0 auto;
 }
 .side {
   width: 300px;
@@ -432,5 +537,132 @@ h3 {
 }
 .checkbox .check {
   background: #9013FE;
+}
+.page {
+  height: 42px;
+  max-width: 1200px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0 auto;
+  padding-right: 3.3%;
+}
+.page li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 41px;
+  height: 100%;
+  background: #FFFFFF;
+  border: 1px solid #ECEEEF;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #9013FE;
+  cursor: pointer;;
+}
+.page li:hover{
+  background: #e5cce8;
+}
+.page .pageNnow {
+  background: #9013FE;
+  border: 1px solid #9013FE;
+  color: #ffffff;
+}
+@media (max-width: 736px){	/*iPhone678 plus 橫式*/
+  .side {
+    width: 200px;
+  }
+  .location {
+    padding: 24px 20px;
+  }
+  .location select {
+    width: 160px;
+    padding-left: 10px;
+  }
+  .categories {
+    padding: 24px 20px;
+  }
+}
+@media (max-width: 667px){	/*iPhone678 橫式*/
+  .header {
+    height: 124px;
+  }
+  .header div {
+    height: 124px;
+    flex-direction: column;
+    background: #EBEBEB;
+    box-shadow: 0 5px 10px 0 #D7D7D7;
+  }
+  .header span {
+    margin-left: 0;
+    background: #7828B4;
+    width: 100%;
+  }
+  h1 {
+    width: 100%;
+    height: 69px;
+    text-align: center;
+  }
+  .header .search {
+    width: 70%;
+    height: 35px;
+    margin-left: 0;
+    justify-content: center;
+    background: #EBEBEB;
+    border-bottom: 1px solid #000;
+    margin: 10px 0;
+  }
+  .header span i {
+    color: #000;
+  }
+  .header span input {
+    background: #EBEBEB;
+  }
+  .header span input::-webkit-input-placeholder {  /* Chrome/Opera/Safari */
+    color: #9B9B9B;
+  }
+  .header span input::-moz-placeholder {  /* Firefox 19+ */
+    color: #9B9B9B;
+  }
+  .header span input:-ms-input-placeholder {  /* IE 10+ */
+    color: #9B9B9B;
+  }
+  .header span input:-moz-placeholder {  /* Firefox 18- */
+    color: #9B9B9B;
+  }
+  .side-content > div {
+    flex-direction: column;
+    padding: 0;
+  }
+  .side {
+    width: 100%;
+    height: auto;
+    border-top: 1px solid #d7d7d7;
+  }
+  .location, .categories {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+  }
+  .location select, .categories ul {
+    margin: 0 0 0 20px;;
+  }
+  .categories ul {
+    display: flex;
+    height: 60px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .categories h3 {
+    margin-bottom: 0;
+  }
+  .checkbox {
+    margin: 0 10px 0 0;
+  }
+}
+@media (max-width: 375px){	/*iPhone678X 直式*/
+  .header .search {
+    width: 90%;
+  }
 }
 </style>

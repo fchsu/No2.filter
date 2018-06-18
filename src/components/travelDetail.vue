@@ -1,7 +1,12 @@
 <template>
   <div class="detail">
     <div class="explore">
-      <p><router-link to="/" class="explore-span">Explore </router-link><span>/ {{ travelContent.Name }}</span></p>
+      <p>
+        <span v-on:click="detailContentClose()">
+          <router-link to="/" class="explore-span">Explore </router-link>
+        </span>
+        <span>/ {{ travelContent.Name }}</span>
+      </p>
     </div>
     <div class="detail-content">
       <div class="img" :style="{backgroundImage: 'url(' + travelContent.Picture1 + ')'}"></div>
@@ -31,13 +36,15 @@ export default {
   name: 'travelDetail',
   data () {
     return {
-      travelContent: JSON.parse(localStorage.getItem('travelContent'))
+      travelContent: JSON.parse(localStorage.getItem('travelContent')),
+      // detailClose: false
     }
   },
-  mounted () {
-  },
   methods: {
-
+    detailContentClose () {
+      // this.detailClose = !this.detailClose;
+      this.$bus.$emit('detailContentClose', true);
+    }
   }
 }
 </script>
@@ -72,8 +79,8 @@ export default {
 .detail-content .img {
   width: 100%;
   height: 352px;
-  background: 50% 50%;
-  background-size: 100% auto;
+  background: #fff 50% 50% no-repeat;
+  background-size: contain;
 }
 .article {
   padding: 24px 6.4%;
