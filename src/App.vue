@@ -105,8 +105,8 @@ export default {
   mounted () {
     const vm = this; // 必須先定義 this，直接在下方程式碼使用 this 會永遠顯示 error.response
     vm.$http
-      // .get("../dist/static/json/data.JSON")    // webpack 壓縮後路徑
-      .get("../../static/json/data.JSON")    // npm run dev 下的路徑
+      .get("../dist/static/json/data.JSON")    // webpack 壓縮後路徑
+      // .get("../../static/json/data.JSON")    // npm run dev 下的路徑
       .then(function(response) {
         if (response.request.readyState === 4) {
           if (response.request.status === 200) {
