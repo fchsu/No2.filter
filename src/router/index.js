@@ -6,6 +6,9 @@ import travelDetail from '@/components/travelDetail'
 Vue.use(Router)
 
 export default new Router({
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  },
   routes: [
     {
       path: '/',
@@ -14,6 +17,16 @@ export default new Router({
     {
       path: '/travelContent',
       name: 'travelContent', 
+      component: travelContent,
+    },
+    {
+      path: '/travelContent/:zone',
+      name: 'travelContent-zone', 
+      component: travelContent,
+    },
+    {
+      path: '/travelContent/:zone/:page',
+      name: 'travelContent-zone-page', 
       component: travelContent,
     },
     {

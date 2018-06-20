@@ -17,7 +17,7 @@
         <div class="side">
           <div class="location">
             <h3>Location</h3>
-            <select v-on:change="filterZone($event)">
+            <select v-on:change="filterZone($event)" v-model="totalSelect[0]">
               <option value= 0>-- Select district --</option>
               <option :value="item" v-for="(item, i) in allZone" :key="i">{{ item }}</option>
             </select>
@@ -37,13 +37,18 @@
         <router-view/>
       </div>
       <ul class="page" v-if="pageOpen">
-        <li>«</li>
-        <li v-if="pageNow > 5">...</li>
-        <li v-for="(item, i) in page" :key="i" 
-          :class="{ pageNnow: item.boolean}"
-          v-on:click="changePage(item.p)">{{ item.p }}</li>
-        <li v-if="pageNum > 5">...</li>
-        <li>»</li>
+        <li><a v-on:click.prevent>«</a></li>
+        <li v-if="pageNow > 5"><a v-on:click.prevent>...</a></li>
+        <li v-for="(item, i) in page" :key="i" v-on:click="changePage(item.p)">
+          <router-link :to="{
+            name: 'travelContent-zone-page',
+            params: { zone: totalSelect[0], page: item.p }
+          }" tag="a"  :class="{ pageNnow: item.boolean}">
+            {{ item.p }}
+          </router-link>
+        </li>
+        <li v-if="pageNum > 5"><a v-on:click.prevent>...</a></li>
+        <li><a v-on:click.prevent>»</a></li>
       </ul>
     </div>
   </div>
@@ -129,6 +134,8 @@ export default {
   },
   methods: {
     filterZone (e) {
+      this.$router.push({ name: 'travelContent-zone', params: { zone: this.totalSelect[0] } });
+      this.pageOpen = true;
       if (e.target.value === " ") {
         this.totalSelect.splice(0, 1, 0);
         this.travelFilter();
@@ -138,6 +145,8 @@ export default {
       }      
     },
     checkOnOff (num) {
+      this.$router.push({ name: 'travelContent-zone', params: { zone: this.totalSelect[0] } });
+      this.pageOpen = true;
       switch (num) {
         case 0:
           if (this.totalSelect[1] == false) {
@@ -397,14 +406,11 @@ export default {
   height: 92px;
   background: #7828b4;
   color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 .header div {
   display: flex;
   align-items: center;
-  width: 1200px;
+  max-width: 1200px;
 }
 .header span {
   margin-left: 6.5%;
@@ -547,12 +553,12 @@ h3 {
   margin: 0 auto;
   padding-right: 3.3%;
 }
-.page li {
+.page a {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 41px;
-  height: 100%;
+  height: 42px;
   background: #FFFFFF;
   border: 1px solid #ECEEEF;
   border-radius: 4px;
@@ -560,7 +566,7 @@ h3 {
   color: #9013FE;
   cursor: pointer;;
 }
-.page li:hover{
+.page a:hover{
   background: #e5cce8;
 }
 .page .pageNnow {
