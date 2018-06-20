@@ -1,21 +1,14 @@
-# no2.filter
+# The F2E 前端修練精神時光屋 第 2 週 作品
 
-> A Vue.js project
+## no2.filter
 
-## Build Setup
+<a href="https://fchsu.github.io/No2.filter/dist/#/travelContent" target="_blank"></a>
 
-``` bash
-# install dependencies
-npm install
+### 高雄旅遊資訊網
 
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+- 網頁使用 Vue 框架
+- 實作 Vue-cli
+- 實作 Vue-router
+- 使用 axios 抓取資料
+- 實作資料篩選功能
+- RWD 功能

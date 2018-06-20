@@ -138,4 +138,9 @@ export default {
   color: #000000;
   line-height: 24px;
 }
+@media (max-width: 667px){	/*iPhone678 橫式*/
+  .detail {
+    margin-left: 0;
+  }
+}
 </style>
